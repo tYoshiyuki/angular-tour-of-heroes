@@ -3,7 +3,7 @@ import {Hero} from './hero';
 import {Observable, of} from 'rxjs';
 import {MessageService} from './message.service';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {catchError, tap} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {formatDate} from '@angular/common';
 
 const httpOptions = {
@@ -34,6 +34,10 @@ export class HeroService {
       );
   }
 
+  put<T>(obj : T) {
+    sessionStorage.setItem('key', JSON.stringify(obj));
+  }
+
   /**
    * Heroを取得します。
    * @param id id
@@ -42,6 +46,7 @@ export class HeroService {
   getHero(id: number): Observable<Hero> {
     const url = `${this.heroesUrl}/${id}`;
     return this.httpClient.get<Hero>(url)
+      .pipe( tap(x => sessionStorage.setItem('hero', JSON.stringify(x))))
       .pipe(
         tap(_ => this.log(`getHero id=${id}`)),
         catchError(this.handleError<Hero>(`getHero id=${id}`))
